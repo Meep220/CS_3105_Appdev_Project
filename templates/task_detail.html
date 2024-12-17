@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h2 class="mb-0">{{ task.title }}</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">{{ task.description }}</p>
+                        <p class="text-muted">Deadline: {{ task.due_date }}</p>
+                        <div class="image-container">
+                            {% if task.image %}
+                                <img src="{{ task.image.url }}" alt="Task image" class='image'>
+                            {% endif %}
+                        </div>
+
+                    {% if task.files %}
+                        <p>Files: <a href="{{ task.files }}" target="_blank">{{ task.files }}</a></p>
+                    {% endif %}
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-0">Status:</p>
+                                <span style="width: 5rem;"
+                                    {% if task.status == 'To-Do' %} class="badge text-bg-warning" {% endif %}
+                                    {% if task.status == 'In Progress' %} class="badge text-bg-primary" {% endif %}
+                                    {% if task.status == 'Done' %} class="badge text-bg-success" {% endif %}
+                                    {% if task.status == 'Ideas' %} class="badge text-bg-info" {% endif %}
+                                    >{{ task.status }}</span>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-0">Priority:</p>
+                                <span style="width: 5rem;"
+                                    {% if task.priority == 'Low' %} class="badge text-bg-info" {% endif %}
+                                    {% if task.priority == 'Medium' %} class="badge text-bg-success" {% endif %}
+                                    {% if task.priority == 'High' %} class="badge text-bg-warning" {% endif %}
+                                    {% if task.priority == 'God Dammit' %} class="badge text-bg-danger" {% endif %}
+                                    >{{ task.priority }}</span>
+                            </div>
+                            <div class="col-md-6">
+                            </br><p class="mb-0">Author:</p>
+                                <span class="badge text-bg-info text-wrap" style="width: 5rem;">{{ task.creator }}</span></br>
+                            </div>
+                            <div class="col-md-6">
+                            </br><p class="mb-0">In project:</p>
+                                {% if task.project %}
+                                    <a href="{% url 'system:project-detail' task.project.id %}">
+                                        <span class="badge text-bg-warning text-wrap" style="width: 5rem;">{{ task.project.title }}</span>
+                                        <br>
+                                    </a>
+                                {% else %}
+                                <span class="badge text-bg-secondary">Not in project</span>
+                                {% endif %}
+                            </div>
+                            </br>
+                            <div class="d-flex justify-content-end">
+                                <div class="btn-group">
+                                    {% if request.user == task.creator %}
+
+                                        <a href="{% url "system:task-update" task.id%}" class="btn btn-sm btn-warning">Edit</a>
+                                        <a href="{% url "system:task-delete" task.id%}" class="btn btn-sm btn-danger">Delete</a>
+                                    {%endif%}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm" style="padding: 20px; overflow-y: auto; max-height: 300px; border: 1px solid #ddd; border-radius: 10px;">
+                    <div class="card-header bg-white">
+                        <h2 class="mb-0">Comments</h2>
+                    </div>
+                    <div class="card-body">
+                        <div style="padding: 20px;">
+                            {% for comment in task.task.all %}
+                            <div class="comment-container" style="margin-bottom: 20px; padding: 2px; border-bottom: 1px solid #ddd;">
+                                <p class="comment-text mb-0">{{ comment.text }}</p>
+                                <p><small style="color: #666; font-size: 12px;">by {{ comment.commenters.username }}</small></p>
+                                <div class="comment-actions" style="display: none;">
+                                    {% if request.user == comment.commenters or request.user == task.creator %}
+                                        {% if request.user == comment.commenters %}
+                                            <a href="{% url "system:comment-edit" comment.id%}" class="btn btn-sm btn-outline-warning edit-btn">Modify</a>
+                                        {% endif %}
+                                        {% if request.user == task.creator or request.user == comment.commenters %}
+                                            <form action="{% url "system:comment-delete" comment.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button class="btn btn-sm btn-outline-danger delete-btn">Delete</button>
+                                            </form>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% empty %}
+                                <p>No comments for this task.</p>
+                            {% endfor %}
+                        </div>
+                        <form action="{% url "system:comments" task.id%}" method="post">
+                            {% csrf_token %}
+                            <div class="input-group mb-3" style="padding: 10px;">
+                                <input type="text" class="form-control" name="text" placeholder="Add a comment...">
+                                <button class="btn btn-sm btn-success" type="submit">Send</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="{% static 'js/comment.js' %}"></script>
+{% endblock %}

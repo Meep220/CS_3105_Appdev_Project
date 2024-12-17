@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-3">
+        <h1>{{ project.title }}</h1>
+        <p>Status: <span class="badge text-bg-success">{{ project.status }}</span></p>
+        <p>Description: {{ project.description }}</p>
+
+        {% if project.image %}
+            <div class="image-container">
+
+                <img src="{{ project.image.url }}" alt="Project image" class='image'>
+            </div>
+        {% endif %}
+
+        {% if project.link %}
+            <p>Link: <a href="{{ project.link }}" target="_blank">{{ project.link }}</a></p>
+        {% endif %}
+
+        {% if project.files %}
+            <p>Files: <a href="{{ project.files }}" target="_blank">{{ project.files }}</a></p>
+        {% endif %}
+
+        <p>Created at: <span class="badge text-bg-success">{{ project.created_at }}</span></p>
+        <p>Updated at: <span class="badge text-bg-primary">{{ project.updated_at }}</span></p>
+        <p>Author: <span class="badge text-bg-info">{{ project.creator_of_project }}</span></p>
+        
+        <p>Members:  {%comment %}remember and use in the future{%endcomment%}
+            {% for member in project.members.all %}
+                <span class="badge text-bg-secondary">{{ member.username }}</span>
+            {% empty %}
+                <span class="badge text-bg-info">No members</span>
+            {% endfor %}
+        </p>
+        <div class="container mt-5">
+            
+            <h5 class="mb-0">Tasks:</h5></br>
+            <div class="row">
+                <div class="col">
+                    <h6>To-Do </h6>
+                    {% for task in project.tasks_in_project.all %}
+                        {% if task.status == "To-Do" %}
+                            <a href="{% url 'system:task-detail' task.id %}">
+                                <span class="badge text-bg-primary">{{ task.title }}</span></br>
+                            </a>
+                        {% endif %}
+                    {% empty %}
+                        <span class="badge text-bg-secondary">No low status tasks for this project.</span>
+                    {% endfor %}
+                </div>
+                <div class="col">
+                    <h6>In Progress </h6>
+                    {% for task in project.tasks_in_project.all %}
+                        {% if task.status == "In Progress" %}
+                            <a href="{% url 'system:task-detail' task.id %}">
+                                <span class="badge text-bg-primary">{{ task.title }}</span></br>
+                            </a>
+                        {% endif %}
+                    {% empty %}
+                        <span class="badge text-bg-secondary">No medium status tasks for this project.</span>
+                    {% endfor %}
+                </div>
+                <div class="col">
+                    <h6>Done </h6>
+                    {% for task in project.tasks_in_project.all %}
+                        {% if task.status == "Done" %}
+                            <a href="{% url 'system:task-detail' task.id %}">
+                                <span class="badge text-bg-primary">{{ task.title }}</span></br>
+                            </a>
+                        {% endif %}
+                    {% empty %}
+                        <span class="badge text-bg-secondary">No high status tasks for this project.</span>
+                    {% endfor %}
+                </div>
+                <div class="col">
+                    <h6>Ideas </h6>
+                    {% for task in project.tasks_in_project.all %}
+                        {% if task.status == "Ideas" %}
+                            <a href="{% url 'system:task-detail' task.id %}">
+                                <span class="badge text-bg-primary">{{ task.title }}</span></br>
+                            </a>
+                        {% endif %}
+                    {% empty %}
+                        <span class="badge text-bg-secondary">No high status tasks for this project.</span>
+                    {% endfor %}
+                </div>
+                
+            </div>
+        </div>
+
+        <br/>
+        <br/>
+        {% if request.user == project.creator_of_project%}
+            <a href="{% url "system:project-update" project.id%}" class="btn btn-warning">Edit</a>
+            <a href="{% url "system:project-delete" project.id%}" class="btn btn-danger">Delete</a> 
+        {%endif%}
+    </div>
+{% endblock %}

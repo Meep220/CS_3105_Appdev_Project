@@ -1,0 +1,20 @@
+{% extends 'home_base.html' %}
+
+{% block content %}
+    <nav>
+        <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2l3.59 7.59-1.41 1.41L12 10l-6.59 6.59L7 18.59l7.59-3.59-1.41-1.41z"/></svg>
+        </div>
+        <div>
+            <p><strong>TaskMaster</strong></p>
+        </div>
+        <button onclick="location.href='{% url 'system:login' %}'" class="btn">Log in</button>
+    </nav>
+    <h1>Conquer Your Chaos!</h1>
+    <p>Say goodbye to the madness and hello to a life of organized bliss. Whether you're juggling classes or drowning in deadlines, we've got your back!</p>
+    <div class="buttons">
+        <button onclick="location.href='{% url 'system:signup' %}'" class="btn">Sign Up</button>
+        <button onclick="location.href='{% url 'system:learn-more' %}'" class="btn">Learn More</button>
+    </div>
+
+{% endblock %}
